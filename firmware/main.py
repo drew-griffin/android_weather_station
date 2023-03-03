@@ -1,28 +1,33 @@
 """"
-import machine
+main.py
 
-led = machine.Pin("LED", machine.Pin.OUT)
-timer = machine.Timer()
+author: Drew Seidel (dseidel@pdx.edu)
 
-def blink(timer):
-    print("hello world"); 
-    led.toggle()
-    
-timer.init(freq=2.5, mode=machine.Timer.PERIODIC, callback=blink)
+brief: This script collects weather data (humidity, temperature, altitude, gas, and pressure data)
+from the BME680 device, and publishes this using and MQTT broker (hive mq in this case)
+as a single formated JSON string, that the android app parses, and displays
+Furthermore, this devices receives a JSON string formatted object with information about two 
+leds, the onboard LED, and an external LED mapped to GP16. The onboard LED is controlled 
+by a switch on the Android App, and the external LED turns on if the temperature is above 70 degrees 
+farenheit
+
+reference to https://github.com/robert-hh/BME680-Micropython for I2C BME 680 driver derived 
+from Adafruit version for CircuitPython, to MicroPython 
 """
 
 import network
 import time
 from machine import Pin, I2C
 from umqtt.simple import MQTTClient
-#import adafruit_bme680
 from bme680 import *
 import broker_secrets
 import json 
 
+#Global variables 
 i2c = I2C(id=1,scl=Pin(15),sda=Pin(14),freq=400000)
-
 bme680 = BME680_I2C(i2c)
+board_led = machine.Pin("LED", machine.Pin.OUT)
+temp_led = machine.Pin(16, machine.Pin.OUT)
 
 
 wlan = network.WLAN(network.STA_IF)
@@ -31,20 +36,35 @@ wlan.connect(broker_secrets.SSID,broker_secrets.PASSWORD)
 time.sleep(5)
 print(wlan.isconnected())
 
-#sensor = Pin(16, Pin.IN)
-
 mqtt_broker = broker_secrets.BROKER
 client_id = broker_secrets.CLIENT_ID
 topic_pub = b'drew/weather_station'
+led_topic_sub = b'drew/led_status_update'
+
+def handle_leds(topic, msg):
+    if (topic == led_topic_sub):
+        message = json.loads(msg)
+        if (message["BOARD_LED"] == "ON"):
+            board_led.on()
+            print("User turning on board LED") 
+        else:
+            board_led.off()
+            print("User turning off board LED") 
+        if (message["TEMP_LED"] == "ON"):
+            temp_led.on()
+            print("Temperature above 70˚F. Turning on temp LED") 
+        else:
+            temp_led.off()
+            print("Temperature dropped below 70˚F. Turning off temp LED") 
 
 
 def weather_update():     
     topic_msg = {
-             f"Temperature = {bme680.temperature}",
-             f"Gas = {bme680.gas}",
-             f"Humidity = {bme680.humidity}",
-             f"Pressure = {bme680.pressure}",
-             f"Altitude = {bme680.altitude}"
+             f"Temperature":  f"{((bme680.temperature - 5) * 9/5 + 32):.2f}",
+             f"Gas":  f"{bme680.gas:.2f}",
+             f"Humidity":  f"{bme680.humidity:.2f}",
+             f"Pressure": f"{bme680.pressure:.2f}",
+             f"Altitude": f"{bme680.altitude:.2f}"
              }
     return topic_msg
 
@@ -52,23 +72,27 @@ def mqtt_connect():
     client = MQTTClient(client_id, mqtt_broker, keepalive=3600)
     client.connect()
     print('Connected to %s MQTT Broker'%mqtt_broker)
+    client.set_callback(handle_leds)
+    client.subscribe(led_topic_sub)
     return client
 
 def reconnect():
     print('Failed to connect to the MQTT Broker. Reconnecting...')
     time.sleep(5)
     machine.reset()
+    
 
 try:
     client = mqtt_connect()
 except OSError as e:
     reconnect()
 while True:
-    print("\nTemperature: %0.1f C" % bme680.temperature )
+    print("\nTemperature: %0.1f F" % ((bme680.temperature - 5) * 9/5 + 32) )
     print("Gas: %d ohm" % bme680.gas)
     print("Humidity: %0.1f %%" % bme680.humidity)
     print("Pressure: %0.3f hPa" % bme680.pressure)
-    print("Altitude = %0.2f meters" % bme680.altitude)
+    print("Altitude:  %0.2f meters" % bme680.altitude)
     topic_msg = weather_update()
     client.publish(topic_pub, json.dumps(topic_msg))
-    time.sleep(1)
+    client.check_msg()
+    time.sleep(0.2)

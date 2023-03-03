@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout2"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ViewDataFragment">
+
+
+    <TextView
+        android:id="@+id/altitude_label"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/Altitude"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="@color/red"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/altitude_update" />
+
+    <TextView
+        android:id="@+id/pressure_label"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/PRESSURE"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="@color/red"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pressure_update" />
+
+    <TextView
+        android:id="@+id/pressure_update"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:text=""
+        android:textAlignment="center"
+        android:gravity="bottom"
+        android:textStyle="bold"
+        android:textColor="@color/red"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gas_label"
+        tools:text="1014.6 hPa"
+        tools:ignore="RtlCompat" />
+
+    <TextView
+        android:id="@+id/altitude_update"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:text=""
+        android:textColor="@color/red"
+        android:textAlignment="center"
+        android:gravity="bottom"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/humidity_label"
+        tools:text="5.73 meters"
+        tools:ignore="RtlCompat" />
+
+    <TextView
+        android:id="@+id/humidity_label"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/HUMIDITY"
+        android:textColor="@color/red"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/humidity_update" />
+
+    <TextView
+        android:id="@+id/update_gas"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:text=""
+        android:textColor="@color/red"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:gravity="bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/LED_label"
+        tools:text="156250 Ω"
+        tools:ignore="RtlCompat" />
+
+    <TextView
+        android:id="@+id/humidity_update"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:text=""
+        android:textColor="@color/red"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:gravity="bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/temp_label"
+        tools:text=".0 %"
+        tools:ignore="RtlCompat" />
+
+    <TextView
+        android:id="@+id/gas_label"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/GAS"
+        android:textColor="@color/red"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/update_gas" />
+
+    <TextView
+        android:id="@+id/LED_label"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/LED_LABEL"
+        android:textColor="@color/red"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/LED_switch" />
+
+    <TextView
+        android:id="@+id/temp_label"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/TEMPERATURE"
+        android:textColor="@color/red"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/update_temp" />
+
+    <TextView
+        android:id="@+id/update_temp"
+        android:layout_width="135dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="63dp"
+        android:layout_marginEnd="20dp"
+        android:text=""
+        android:gravity="bottom"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:textColor="@color/red"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="78.8ºF"
+        tools:ignore="RtlCompat" />
+
+
+    <Switch
+        android:id="@+id/LED_switch"
+        android:layout_width="78dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="63dp"
+        android:text=""
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/disconnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="DISCONNECT"
+        android:textStyle="bold"
+        android:backgroundTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/altitude_label" />
+</androidx.constraintlayout.widget.ConstraintLayout>

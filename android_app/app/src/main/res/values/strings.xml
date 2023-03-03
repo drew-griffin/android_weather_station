@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">WeatherStation</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="TEMPERATURE">TEMPERATURE</string>
+    <string name="GAS">GAS</string>
+    <string name="HUMIDITY">HUMIDITY</string>
+    <string name="PRESSURE">PRESSURE</string>
+    <string name="Altitude">ALTITUDE</string>
+    <string name="LED_LABEL">LED</string>
+    <string name="waiting_for_mqtt_connection">Welcome to Drew\'s Weather Station...</string>
 </resources>
