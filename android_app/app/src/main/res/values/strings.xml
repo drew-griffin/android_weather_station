@@ -8,5 +8,5 @@
     <string name="PRESSURE">PRESSURE</string>
     <string name="Altitude">ALTITUDE</string>
     <string name="LED_LABEL">LED</string>
-    <string name="waiting_for_mqtt_connection">Welcome to Drew\'s Weather Station...</string>
+    <string name="waiting_for_mqtt_connection">Connect to Drew\'s Weather Station… \ \ </string>
 </resources>
