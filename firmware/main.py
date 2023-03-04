@@ -11,8 +11,13 @@ leds, the onboard LED, and an external LED mapped to GP16. The onboard LED is co
 by a switch on the Android App, and the external LED turns on if the temperature is above 70 degrees 
 farenheit
 
-reference to https://github.com/robert-hh/BME680-Micropython for I2C BME 680 driver derived 
-from Adafruit version for CircuitPython, to MicroPython 
+reference to: 
+
+https://github.com/robert-hh/BME680-Micropython for I2C MicroPython BME 680 driver modified from Adafruit CircuitPython
+https://www.tomshardware.com/how-to/send-and-receive-data-raspberry-pi-pico-w-mqtt
+project release  .../ece558w23_proj2_release/starters/aht20_picoW_example/* 
+
+
 """
 
 import network
@@ -41,9 +46,10 @@ client_id = broker_secrets.CLIENT_ID
 topic_pub = b'drew/weather_station'
 led_topic_sub = b'drew/led_status_update'
 
+#handle LEDs callback to subscription led_topic_sub
 def handle_leds(topic, msg):
-    if (topic == led_topic_sub):
-        message = json.loads(msg)
+    if (topic == led_topic_sub):  #should always be true, but check in case
+        message = json.loads(msg) #convert JSON object to Python Dictionary
         if (message["BOARD_LED"] == "ON"):
             board_led.on()
             print("User turning on board LED") 
@@ -72,8 +78,8 @@ def mqtt_connect():
     client = MQTTClient(client_id, mqtt_broker, keepalive=3600)
     client.connect()
     print('Connected to %s MQTT Broker'%mqtt_broker)
-    client.set_callback(handle_leds)
-    client.subscribe(led_topic_sub)
+    client.set_callback(handle_leds) #set callback handler to leds
+    client.subscribe(led_topic_sub)  #subsribed to LED topic 
     return client
 
 def reconnect():
@@ -86,13 +92,15 @@ try:
     client = mqtt_connect()
 except OSError as e:
     reconnect()
+# main loop 
 while True:
+    # display measurements on console. Offset by -5 degrees for PCB temp 
     print("\nTemperature: %0.1f F" % ((bme680.temperature - 5) * 9/5 + 32) )
     print("Gas: %d ohm" % bme680.gas)
     print("Humidity: %0.1f %%" % bme680.humidity)
     print("Pressure: %0.3f hPa" % bme680.pressure)
     print("Altitude:  %0.2f meters" % bme680.altitude)
-    topic_msg = weather_update()
-    client.publish(topic_pub, json.dumps(topic_msg))
-    client.check_msg()
-    time.sleep(0.2)
+    topic_msg = weather_update()                     #call weather update to format string
+    client.publish(topic_pub, json.dumps(topic_msg)) #publish topic message as JSON
+    client.check_msg()                               #check subscription message
+    time.sleep(1)                                    #1 second

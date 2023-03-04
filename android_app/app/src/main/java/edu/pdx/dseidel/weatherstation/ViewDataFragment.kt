@@ -13,6 +13,7 @@
 
 package edu.pdx.dseidel.weatherstation
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -25,30 +26,20 @@ import org.eclipse.paho.client.mqttv3.*
 import org.json.JSONException
 import org.json.JSONObject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-private lateinit var communicator: Communicator
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ViewDataFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@Suppress("PrivatePropertyName")
 class ViewDataFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
     private val TAG = MainActivity::class.java.simpleName
+
 
     private lateinit var mqttClient : MQTTClient
     private lateinit var mqttClientID: String
-    private lateinit var communicator: Communicator
+    private lateinit var communicator: Communicator //used to communicate to first fragment on disconnect
 
-    private var highTemp : Boolean = false
-    private var boardLedOn : Boolean = false
-    private lateinit var led_STATUS : String
+    private var highTemp : Boolean = false  //true if over 70 f, false otherwise
+    private var boardLedOn : Boolean = false //true if led switch turned on, false otherwise, initialized to false
+    private lateinit var led_STATUS : String //led string to be JSON formatted to send to Raspberry Pico W, containing status of LEDS
 
 
     private var _binding: ViewDataFragmentBinding? = null
@@ -56,13 +47,6 @@ class ViewDataFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
            super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-
-
 
     }
 
@@ -78,15 +62,20 @@ class ViewDataFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        /* On successful view creation, do the following */
+
         // open mQTT Broker communication
         mqttClientID = MqttClient.generateClientId()
         mqttClient = MQTTClient(activity, MQTT_SERVER_URI, mqttClientID)
-
         connectMQTT()
+
+        //initialize communicator
         communicator = activity as Communicator
+
+        //set callback method for disconnect button
         binding.disconnect.setOnClickListener { disconnectButtonClicked() }
 
-
+        //create method for handling the switch for the onboard Pico W LED
         binding.LEDSwitch.setOnCheckedChangeListener { _, isChecked ->
             boardLedOn = isChecked
             ledHandler(LED_STATUS_UPDATE)
@@ -106,7 +95,6 @@ class ViewDataFragment : Fragment() {
                     val successMsg = "MQTT Connection to $MQTT_SERVER_URI Established"
                     Toast.makeText(activity, successMsg, Toast.LENGTH_LONG).show()
 
-
                     // subscribe to the status topics
                     subscribeToStatus(WEATHER_UPDATE)
                 }
@@ -119,8 +107,12 @@ class ViewDataFragment : Fragment() {
                     exception?.printStackTrace()
                 }
             },
-
+            //MqttCallback object provides the main brains for the frontend UI
+            //upon MQTT message arrival, we parse the JSON formatted string,
+            //update the display, check the temperature, and if there was a
+            //change from the previous state, update highTemp, and call the ledHandler
             object : MqttCallback {
+                @SuppressLint("SetTextI18n")
                 override fun messageArrived(topic: String?, message: MqttMessage?) {
                     val msg = "Received message: ${message.toString()} from topic: $topic"
                     Log.d(TAG, msg)
@@ -136,18 +128,15 @@ class ViewDataFragment : Fragment() {
                         binding.altitudeUpdate.text = weatherData.getString("Altitude") + " M"
 
                        val tempString = weatherData.getString("Temperature")
-                       val temp : Double? = tempString.toDouble()
+                       val temp : Double = tempString.toDouble()
 
-                        if (temp != null) {
-                            if (temp >= 70 && !highTemp) {
-                                highTemp = true
-                                ledHandler(LED_STATUS_UPDATE)
-                            } else if (temp < 70 && highTemp) {
-                                highTemp = false
-                                ledHandler(LED_STATUS_UPDATE)
-                            }
+                        if ((temp >= 70) && !highTemp) {
+                            highTemp = true
+                            ledHandler(LED_STATUS_UPDATE)
+                        } else if ((temp < 70) && highTemp) {
+                            highTemp = false
+                            ledHandler(LED_STATUS_UPDATE)
                         }
-
                     }
                 }
 
@@ -195,11 +184,10 @@ class ViewDataFragment : Fragment() {
         } else {
             Log.d(TAG, "Impossible to publish, no server connected")
         }
-
     }
     private fun disconnectButtonClicked() {
-        mqttClient.disconnect()
-        communicator.disconnect()
+        mqttClient.disconnect() //disconnect from MQTT
+        communicator.disconnect() //use the communicator to call the disconnect method in Main Activity
     }
 
     private fun subscribeToStatus(subscribeTopic: String) {
@@ -227,24 +215,5 @@ class ViewDataFragment : Fragment() {
         } else {
             Log.d(TAG, "Cannot subscribe to $WEATHER_UPDATE: Not connected to server")
         }
-    }
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ViewData.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ViewDataFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }

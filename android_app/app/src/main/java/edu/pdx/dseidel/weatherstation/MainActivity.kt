@@ -6,6 +6,11 @@
  *
  * The second, upon successful connection, will host the weather station app
  *
+ * Reference to:
+ * ../ece558w23_proj2_release/starters/MQTTLedExample/
+ * ../FragmentExample
+ * https://www.tutorialspoint.com/send-data-from-one-fragment-to-another-using-kotlin
+ *
  */
 
 package edu.pdx.dseidel.weatherstation
@@ -15,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import edu.pdx.dseidel.weatherstation.databinding.ActivityMainBinding
 
-var connected = false
 
 class MainActivity : AppCompatActivity(), Communicator{
     private lateinit var binding: ActivityMainBinding
@@ -25,11 +29,8 @@ class MainActivity : AppCompatActivity(), Communicator{
         setContentView(binding.root)
 
         //open first connect fragment on start
-        if(!connected) {
-            val connectFragment = ConnectFragment()
-            supportFragmentManager.beginTransaction().replace(R.id.view_manager, connectFragment)
-                .commit()
-        }
+        val connectFragment = ConnectFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.view_manager, connectFragment).commit()
     }
 
     //upon connect button clicked on main screen, go to second fragment for weather station
